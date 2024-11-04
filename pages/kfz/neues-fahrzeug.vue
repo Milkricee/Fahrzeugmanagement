@@ -11,10 +11,6 @@
         <input id="modell" v-model="newFahrzeug.modell" type="text" class="p-2 border rounded w-full" required />
       </div>
       <div>
-        <label class="block text-sm font-medium" for="hersteller">Hersteller</label>
-        <input id="hersteller" v-model="newFahrzeug.hersteller" type="text" class="p-2 border rounded w-full" required />
-      </div>
-      <div>
         <label class="block text-sm font-medium" for="kennzeichen">Kennzeichen</label>
         <input id="kennzeichen" v-model="newFahrzeug.kennzeichen" type="text" class="p-2 border rounded w-full" required />
       </div>
@@ -54,7 +50,6 @@ import { useNuxtApp, useRouter } from '#app';
 const newFahrzeug = ref({
   marke: '',
   modell: '',
-  hersteller: '',
   kennzeichen: '',
   kilometerstand: null,
   erstzulassung: null,
@@ -72,7 +67,6 @@ async function addFahrzeug() {
   const processedFahrzeug = {
     marke: newFahrzeug.value.marke || null,
     modell: newFahrzeug.value.modell,
-    hersteller: newFahrzeug.value.hersteller,
     kennzeichen: newFahrzeug.value.kennzeichen,
     kilometerstand: newFahrzeug.value.kilometerstand || null,
     erstzulassung: newFahrzeug.value.erstzulassung || null,
