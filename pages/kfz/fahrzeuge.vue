@@ -4,32 +4,38 @@
       <h1 class="text-2xl font-bold">Fahrzeugliste</h1>
       <NuxtLink to="/kfz/neues-fahrzeug" class="text-white bg-blue-500 p-2 rounded-full text-xl">+</NuxtLink>
     </div>
-
-    <!-- Liste der Fahrzeuge -->
     <div>
-      <FahrzeugItem v-for="fahrzeug in fahrzeuge" :key="fahrzeug.projekt_id" :fahrzeug="fahrzeug" />
+      <FahrzeugItem v-for="fahrzeug in filteredFahrzeuge" :key="fahrzeug.projekt_id" :fahrzeug="fahrzeug" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
+import { searchQuery } from '~/composables/useSearchStore'; // Suche verwenden
 import FahrzeugItem from '~/components/FahrzeugItem.vue';
 
 const fahrzeuge = ref([]);
 const { $supabase } = useNuxtApp();
 
-onMounted(async () => {
-  await fetchFahrzeuge();
-});
-
+// Fahrzeuge beim Laden der Seite abrufen
 async function fetchFahrzeuge() {
   const { data, error } = await $supabase.from('fahrzeuge').select('*');
-  if (error) {
-    console.error("Fehler beim Abrufen der Fahrzeugdaten:", error);
-  } else {
+  if (!error) {
     fahrzeuge.value = data;
   }
 }
+
+onMounted(fetchFahrzeuge);
+
+// Filterte Fahrzeuge nur anzeigen, wenn searchQuery einen Wert hat
+const filteredFahrzeuge = computed(() => {
+  if (!searchQuery.value) {
+    return fahrzeuge.value; // Zeige alle Fahrzeuge an, wenn das Suchfeld leer ist
+  }
+  return fahrzeuge.value.filter(fahrzeug =>
+    fahrzeug.kennzeichen.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 </script>

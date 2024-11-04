@@ -1,25 +1,42 @@
 <template>
   <header class="bg-blue-500 text-white p-4">
     <nav class="flex items-center space-x-4">
-      <!-- Navigation Links -->
       <ul class="flex space-x-4">
-        <li><NuxtLink to="/">Home</NuxtLink></li>
-        <li><NuxtLink to="/kfz/fahrzeuge">Fahrzeuge</NuxtLink></li>
-        <li><NuxtLink to="/versicherung">Versicherung</NuxtLink></li>
+        <li>
+          <NuxtLink to="/" @click="clearSearch">Home</NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/kfz/fahrzeuge" @click="clearSearch">Fahrzeuge</NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/versicherung" @click="clearSearch">Versicherung</NuxtLink>
+        </li>
       </ul>
-      
+
       <!-- Suchleiste -->
-      <div class="flex items-center space-x-2 ml-auto">
+      <div class="flex items-center space-x-2 ml-auto relative">
         <input
           type="text"
           v-model="searchQuery"
-          @keyup.enter="executeSearch"
-          placeholder="Suche..."
+          @input="fetchSuggestions"
+          placeholder="Suche nach Kennzeichen..."
           class="p-2 rounded-md text-black"
         />
         <button @click="executeSearch" class="bg-white text-blue-500 px-4 py-2 rounded-md">
           Suchen
         </button>
+
+        <!-- Vorschlagsliste -->
+        <ul v-if="suggestions.length > 0" class="absolute bg-white text-black p-2 rounded-md shadow-md top-full mt-1 w-full max-h-48 overflow-y-auto">
+          <li
+            v-for="kennzeichen in suggestions"
+            :key="kennzeichen"
+            @click="selectSuggestion(kennzeichen)"
+            class="cursor-pointer hover:bg-blue-100 p-2"
+          >
+            {{ kennzeichen }}
+          </li>
+        </ul>
       </div>
     </nav>
   </header>
@@ -27,29 +44,42 @@
 
 <script setup>
 import { ref } from 'vue';
+import { searchQuery } from '~/composables/useSearchStore'; // Globale Such-Variable
+import { useRouter, useNuxtApp } from '#app';
 
-// Daten für die Suche (zum späteren Implementieren der Suchlogik)
-const searchQuery = ref('');
+const suggestions = ref([]);
+const { $supabase } = useNuxtApp();
+const router = useRouter();
 
-// Methode, die später für die Suche genutzt wird
+async function fetchSuggestions() {
+  if (searchQuery.value.length > 0) {
+    const { data, error } = await $supabase
+      .from('fahrzeuge')
+      .select('kennzeichen')
+      .ilike('kennzeichen', `${searchQuery.value}%`)
+      .limit(5);
+    if (!error) {
+      suggestions.value = data.map(item => item.kennzeichen);
+    }
+  } else {
+    suggestions.value = [];
+  }
+}
+
 function executeSearch() {
-  console.log("Sucheingabe:", searchQuery.value);
-  // Hier wird die Suche zu einem späteren Zeitpunkt implementiert
+  if (searchQuery.value) {
+    router.push('/kfz/fahrzeuge');
+  }
+}
+
+function selectSuggestion(kennzeichen) {
+  searchQuery.value = kennzeichen;
+  suggestions.value = [];
+  executeSearch();
+}
+
+// Neue Funktion zum Zurücksetzen der Suche
+function clearSearch() {
+  searchQuery.value = '';
 }
 </script>
-
-<style scoped>
-  header {
-    background-color: #1E3A8A; /* Tailwind Indigo-700 */
-    color: white;
-    padding: 1rem;
-  }
-  ul {
-    display: flex;
-    gap: 1rem;
-  }
-  input {
-    outline: none;
-    border: 1px solid #ccc;
-  }
-</style>
