@@ -38,27 +38,27 @@ const fahrzeug = ref({
 });
 
 const { $supabase } = useNuxtApp();
-const router = useRouter();
 const route = useRoute();
+const router = useRouter();  // Hinzufügen von router, damit Navigation funktioniert
+const fin = route.query.fin; // Die FIN aus der Query abrufen
 
 onMounted(async () => {
-  const kennzeichen = route.query.kennzeichen;
-  const { data, error } = await $supabase.from('fahrzeuge').select('*').eq('kennzeichen', kennzeichen).single();
+  const { data, error } = await $supabase.from('fahrzeuge').select('*').eq('fin', fin).single(); // Ändern auf 'fin'
   if (error) {
     console.error("Fehler beim Abrufen des Fahrzeugs:", error);
-    router.push('/kfz/fahrzeuge');
+    router.push('/kfz/fahrzeuge');  // Navigation bei Fehler
   } else {
     fahrzeug.value = data;
   }
 });
 
 async function updateFahrzeug(fahrzeugData) {
-  const { data, error } = await $supabase.from('fahrzeuge').update(fahrzeugData).eq('kennzeichen', fahrzeugData.kennzeichen);
+  const { data, error } = await $supabase.from('fahrzeuge').update(fahrzeugData).eq('fin', fahrzeugData.fin); // Ändern auf 'fin'
   if (error) {
     console.error("Fehler beim Aktualisieren des Fahrzeugs:", error);
   } else {
     console.log("Fahrzeug erfolgreich aktualisiert:", data);
-    router.push('/kfz/fahrzeuge');
+    router.push('/kfz/fahrzeuge');  // Navigation nach erfolgreichem Update
   }
 }
 </script>

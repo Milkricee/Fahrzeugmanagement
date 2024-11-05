@@ -10,9 +10,10 @@
         <button @click="confirmDelete" class="text-red-500 hover:text-red-700">
           🗑️
         </button>
-        <NuxtLink :to="{ path: '/kfz/fahrzeug-bearbeiten', query: { kennzeichen: fahrzeug.kennzeichen } }" class="text-blue-500 hover:text-blue-700">
-          ✏️
-        </NuxtLink>
+        <NuxtLink :to="{ path: '/kfz/fahrzeug-bearbeiten', query: { fin: fahrzeug.fin } }" class="text-blue-500 hover:text-blue-700">
+  ✏️
+</NuxtLink>
+
       </div>
     </div>
 
@@ -59,24 +60,27 @@ function toggleDetails() {
   showDetails.value = !showDetails.value;
 }
 
+// In der Funktion confirmDelete ändern wir den Bestätigungsdialog
 function confirmDelete() {
   // Bestätigungsdialog anzeigen
-  if (confirm(`Möchten Sie das Fahrzeug ${props.fahrzeug.marke} mit dem Kennzeichen ${props.fahrzeug.kennzeichen} wirklich löschen?`)) {
+  if (confirm(`Möchten Sie das Fahrzeug ${props.fahrzeug.marke} mit der FIN ${props.fahrzeug.fin} wirklich löschen?`)) {
     deleteFahrzeug();
   }
 }
 
+// In der Funktion deleteFahrzeug den Filter von `kennzeichen` auf `fin` ändern
 async function deleteFahrzeug() {
   const { error } = await $supabase
     .from('fahrzeuge')
     .delete()
-    .eq('kennzeichen', props.fahrzeug.kennzeichen);
+    .eq('fin', props.fahrzeug.fin);
   
   if (error) {
     console.error("Fehler beim Löschen des Fahrzeugs:", error);
   } else {
     console.log("Fahrzeug erfolgreich gelöscht");
-    router.go(0); // Seite neu laden
+  router.go(0);
   }
 }
+
 </script>

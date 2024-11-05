@@ -17,6 +17,10 @@
         <input id="kilometerstand" v-model="fahrzeug.kilometerstand" type="number" class="p-2 border rounded w-full" />
       </div>
       <div>
+        <label class="block text-sm font-medium" for="fin">Fahrzeug-Identifizierungsnummer (FIN)</label>
+        <input id="fin" v-model="fahrzeug.fin" type="text" class="p-2 border rounded w-full" :disabled="isEditing" required />
+        </div>
+      <div>
         <label class="block text-sm font-medium" for="erstzulassung">Erstzulassung</label>
         <input id="erstzulassung" v-model="fahrzeug.erstzulassung" type="date" class="p-2 border rounded w-full" />
       </div>
@@ -117,26 +121,30 @@
   
   <script setup>
   import { ref, watch, defineProps, defineEmits } from 'vue';
-  
+
   const props = defineProps({
     initialData: Object,
     isEditing: Boolean
   });
   const emit = defineEmits(['submit']);
-  
-  const fahrzeug = ref({ ...props.initialData });
+
+  // Initialisiere das Fahrzeug-Objekt mit der fin und den anderen Properties
+  const fahrzeug = ref({
+    fin: props.initialData.fin || '', // FIN als Primary Key
+    ...props.initialData
+  });
   const showMoreInfo = ref(false);
-  
+
   function toggleMoreInfo() {
     showMoreInfo.value = !showMoreInfo.value;
   }
-  
+
   function onSubmit() {
     emit('submit', fahrzeug.value);
   }
-  
+
+  // Watch für Änderungen in den initialData-Props, um die Werte zu aktualisieren
   watch(() => props.initialData, (newData) => {
-    fahrzeug.value = { ...newData };
+    fahrzeug.value = { fin: newData.fin || '', ...newData };
   });
-  </script>
-  
+</script>

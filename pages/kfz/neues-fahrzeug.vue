@@ -11,6 +11,7 @@ import FahrzeugForm from '~/components/FahrzeugForm.vue';
 import { useNuxtApp, useRouter } from '#app';
 
 const newFahrzeug = ref({
+  fin: '',
   marke: '',
   modell: '',
   kennzeichen: '',
@@ -41,6 +42,10 @@ const { $supabase } = useNuxtApp();
 const router = useRouter();
 
 async function addFahrzeug(fahrzeugData) {
+  if (!fahrzeugData.fin) {
+    console.error("FIN ist erforderlich, um ein Fahrzeug hinzuzufügen.");
+    return;
+  }
   const { data, error } = await $supabase.from('fahrzeuge').insert([fahrzeugData]);
   if (error) {
     console.error("Fehler beim Hinzufügen des Fahrzeugs:", error.message, error.details);
@@ -49,4 +54,5 @@ async function addFahrzeug(fahrzeugData) {
     router.push('/kfz/fahrzeuge');
   }
 }
+
 </script>
