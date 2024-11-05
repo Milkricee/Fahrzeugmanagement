@@ -34,7 +34,8 @@
       </div>
   
       <!-- Button zum Ein- und Ausklappen des erweiterten Bereichs -->
-      <button type="button" @click="toggleMoreInfo" class="mt-4 text-blue-500 hover:underline">
+      <button type="button" @click="toggleMoreInfo" class="mt-4 mb-8 text-blue-500 hover:underline">
+
         {{ showMoreInfo ? 'Weniger Infos' : 'Weitere Infos' }}
       </button>
   
@@ -107,7 +108,8 @@
       </div>
   
       <!-- Speichern Button -->
-      <button type="submit" class="mt-4 bg-green-500 text-white p-2 rounded">
+      <button type="submit" class="mt-8 ml-5 bg-green-500 text-white p-2 rounded">
+
         {{ isEditing ? 'Änderungen speichern' : 'Speichern' }}
       </button>
     </form>
