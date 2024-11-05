@@ -1,14 +1,19 @@
 <template>
   <div class="mb-4 p-4 rounded-lg border border-gray-300 bg-gray-100">
-    <!-- Fahrzeugüberschrift mit Kennzeichen und Bearbeitungssymbol -->
+    <!-- Fahrzeugüberschrift mit Kennzeichen und Bearbeitung/Löschsymbolen -->
     <div class="flex justify-between items-center">
       <div @click="toggleDetails" class="cursor-pointer font-semibold text-blue-700 hover:text-blue-900">
         {{ fahrzeug.marke }} {{ fahrzeug.modell }} - Kennzeichen: {{ fahrzeug.kennzeichen }}
       </div>
-      <!-- Bearbeitungssymbol -->
-      <NuxtLink :to="{ path: '/kfz/fahrzeug-bearbeiten', query: { kennzeichen: fahrzeug.kennzeichen } }" class="text-blue-500 hover:text-blue-700 ml-2">
-        ✏️
-      </NuxtLink>
+      <!-- Symbole für Löschen und Bearbeiten -->
+      <div class="flex space-x-2">
+        <button @click="confirmDelete" class="text-red-500 hover:text-red-700">
+          🗑️
+        </button>
+        <NuxtLink :to="{ path: '/kfz/fahrzeug-bearbeiten', query: { kennzeichen: fahrzeug.kennzeichen } }" class="text-blue-500 hover:text-blue-700">
+          ✏️
+        </NuxtLink>
+      </div>
     </div>
 
     <!-- Detaillierte Fahrzeuginformationen -->
@@ -40,20 +45,38 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useNuxtApp, useRouter } from '#app';
 
 const props = defineProps({
   fahrzeug: Object
 });
 
+const { $supabase } = useNuxtApp();
+const router = useRouter();
 const showDetails = ref(false);
 
 function toggleDetails() {
   showDetails.value = !showDetails.value;
 }
-</script>
 
-<style scoped>
-.cursor-pointer:hover {
-  color: #4A90E2;
+function confirmDelete() {
+  // Bestätigungsdialog anzeigen
+  if (confirm(`Möchten Sie das Fahrzeug ${props.fahrzeug.marke} mit dem Kennzeichen ${props.fahrzeug.kennzeichen} wirklich löschen?`)) {
+    deleteFahrzeug();
+  }
 }
-</style>
+
+async function deleteFahrzeug() {
+  const { error } = await $supabase
+    .from('fahrzeuge')
+    .delete()
+    .eq('kennzeichen', props.fahrzeug.kennzeichen);
+  
+  if (error) {
+    console.error("Fehler beim Löschen des Fahrzeugs:", error);
+  } else {
+    console.log("Fahrzeug erfolgreich gelöscht");
+    router.go(0); // Seite neu laden
+  }
+}
+</script>
