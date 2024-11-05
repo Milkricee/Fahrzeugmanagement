@@ -10,7 +10,7 @@
       </div>
       <div>
         <label class="block text-sm font-medium" for="kennzeichen">Kennzeichen</label>
-        <input id="kennzeichen" v-model="fahrzeug.kennzeichen" type="text" class="p-2 border rounded w-full" :disabled="isEditing" required />
+        <input id="kennzeichen" v-model="fahrzeug.kennzeichen" type="text" class="p-2 border rounded w-full" required />
       </div>
       <div>
         <label class="block text-sm font-medium" for="kilometerstand">Kilometerstand</label>
